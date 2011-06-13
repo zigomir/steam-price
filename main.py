@@ -5,6 +5,9 @@ from steam_parse import load_and_return_price
 import datetime
 import os
 
+STEAM_URL = 'http://store.steampowered.com/app/'
+SENDER = 'Steam Price <zigomir@gmail.com>'
+
 class Subscriber(db.Model):
     email = db.StringProperty()
     steam_app_id = db.IntegerProperty()
@@ -26,10 +29,24 @@ class SubscribeHandler(webapp.RequestHandler):
         
         subscriber = Subscriber(email=email, 
                                 informed=False,
+                                informed_date=None,
                                 steam_app_id=int(steam_app_id),
                                 price=float(price))
         subscriber.put()
+        self.send_email(subscriber)
         self.response.out.write('s')
+        
+    def send_email(self, subscriber):
+        mail.send_mail(sender=SENDER,
+                  to=subscriber.email,
+                  subject="You've subscribed to steam price checker",
+                  body="""
+        Dear Steam price user:
+        
+        You've subscribed for a warning when game (%s) will be cheaper than %d EUR.
+        
+        http://steam-price.appspot.com
+        """ % (STEAM_URL + str(subscriber.steam_app_id), subscriber.price))
         
 class InformHandler(webapp.RequestHandler):
     def get(self):
@@ -38,29 +55,23 @@ class InformHandler(webapp.RequestHandler):
         for subscriber in query:
             price = load_and_return_price(subscriber.steam_app_id)
             if price <= subscriber.price:
-                self.response.out.write(str(price) + '<=' + str(subscriber.price))
                 self.send_email(subscriber)
-            else:
-                self.response.out.write(str(price) + '>' + str(subscriber.price))
+                subscriber.informed = True
+                subscriber.informed_date = datetime.datetime.now()
+                subscriber.put()
         
-    def send_email(self, subscriber):    
-        STEAM_URL = 'http://store.steampowered.com/app/'
-        
+    def send_email(self, subscriber):
         # Your application won't work on your Localhost, so upload it
-        mail.send_mail(sender="Steam Price <zigomir@gmail.com>",
+        mail.send_mail(sender=SENDER,
                   to=subscriber.email,
                   subject="Check out new Steam price!",
                   body="""
-        Dear Steam price User:
+        Dear Steam price user:
         
         We're pleased to announce, that price of the game (%s) is lower than %d EUR.
         
         http://steam-price.appspot.com
         """ % (STEAM_URL + str(subscriber.steam_app_id), subscriber.price))
-        
-        subscriber.informed = True
-        subscriber.informed_date = datetime.datetime.now()
-        subscriber.put()
        
 def main():
     application = webapp.WSGIApplication(

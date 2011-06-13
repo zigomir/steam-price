@@ -2,9 +2,15 @@
 
 {% block content %}
 <form id="subscribeForm">
-    <input id="steam_app_id" name="steam_app_id" type="number" />
-    <input id="price" name="price" type="number" />
-    <input id="email" name="email" type="email" />
+    <label for="steam_app_id">Steam APP ID</label>
+    <input id="steam_app_id" name="steam_app_id" class="integer" />
+    
+    <label for="price">I want price lower than</label>
+    <input id="price" name="price" class="integer" />
+    
+    <label for="email">Email</label>
+    <input id="email" name="email" type="text" />
+    
     <input id="subscribeButton" type="button" value="Subscribe" />
 </form>
 <div id="message" style="color: green;"></div>
@@ -12,8 +18,13 @@
     <a href="mailto:zigomir@gmail.com">Feedback? (careful, mailto link)</a>
 </div>
 
+<script src="/script/jquery.numeric.js"></script>
 <script>
+$('.integer').numeric(false);
+
 $('#subscribeButton').click(function() {
+    $('#message').text('');
+    
     $.post('/subscribe', 
         $("#subscribeForm").serialize(), 
         function(data) {

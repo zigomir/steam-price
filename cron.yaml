@@ -1,0 +1,4 @@
+cron:
+- description: daily inform job
+  url: /inform
+  schedule: every 12 hours
