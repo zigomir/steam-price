@@ -1,4 +1,6 @@
-﻿from BeautifulSoup import BeautifulSoup
+﻿# -*- coding: utf_8 -*-
+
+from BeautifulSoup import BeautifulSoup
 from google.appengine.api import urlfetch
 
 STEAM_URL = 'http://store.steampowered.com/app/'
@@ -9,6 +11,7 @@ def parse_euro(str):
     return float(numText)
     
 def parse_dollar(str):
+    str = str.replace('USD', '').strip()    # country code wf for example
     numText = str[5:len(str)]
     return float(numText)
 
@@ -38,10 +41,10 @@ def load_and_return_price(steam_app_id, country):
     
     if len(priceStr) > 0:
         if '&#8364;' in priceStr:
-            priceNum = parse_euro(priceStr)
+            priceNum, currency_sign = parse_euro(priceStr), '€'
         if '&#36;' in priceStr:
-            priceNum = parse_dollar(priceStr)
+            priceNum, currency_sign = parse_dollar(priceStr), '$'
         if '&#163;' in priceStr:
-            priceNum = parse_pound(priceStr)
+            priceNum, currency_sign = parse_pound(priceStr), '£'
             
-        return priceNum
+        return priceNum, currency_sign
