@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+{% for subscriber in subscribers %}
+<div class="subscriber">
+    <span class="subscriber_id">{{ subscriber.key.id }}</span>
+    <span class="price">{{ subscriber.price }}</span>
+    <span class="steam_app_id">{{ subscriber.steam_app_id }}</span>
+    <span class="email">{{ subscriber.email }}</span>
+</div>
+{% endfor %}
+
+<script>
+
+// for euros
+function parsePriceEuro(priceStr) {
+    var priceLength = priceStr.indexOf(',') + 3;
+    var result = priceStr.substring(0, priceLength).replace(',', '.');
+    return parseFloat(result);
+}
+
+//for dollar
+function parsePriceDollar(priceStr) {
+    var result = priceStr.substring(1, priceStr.length).replace(',', '.');
+    return parseFloat(result);
+}
+
+$('.subscriber').each(function(index){
+    $.post('/check', {'steam_app_id': $(this).find('.steam_app_id').text()}, 
+        function(data) {
+        
+            var priceDivs;
+            priceDivs = $(data).find('div.discount_final_price');
+            
+            if (!priceDivs.length) {
+                priceDivs = $(data).find('div.game_purchase_price');
+            }
+            
+            var priceStr = priceDivs.first().text().trim();
+            var priceNumber = parsePriceDollar(priceStr);
+            console.log(priceNumber);
+            
+            var lowerThanPrice = parseFloat($('.price:eq(' + index + ')').text());
+            console.log(lowerThanPrice);
+            
+            if (priceNumber <= lowerThanPrice) {
+                var id_to_inform = $('.subscriber_id:eq(' + index + ')').text()
+                console.log('ID to inform: ' + id_to_inform);
+                
+                $.post('/inform', {'id_to_inform': id_to_inform},
+                    function(data){
+                        console.log(data);
+                    }
+                );
+            }
+        }, 
+        'text'
+    );
+});
+
+</script>
+{% endblock %}
