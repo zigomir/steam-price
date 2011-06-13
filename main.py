@@ -1,7 +1,8 @@
 from google.appengine.api import mail
 from google.appengine.ext import webapp, db
 from google.appengine.ext.webapp import template, util
-from steam_communication import get_price_for_id
+from steam_parse import load_and_return_price
+import datetime
 import os
 
 class Subscriber(db.Model):
@@ -10,6 +11,7 @@ class Subscriber(db.Model):
     price = db.FloatProperty()
     informed = db.BooleanProperty()
     date = db.DateTimeProperty(auto_now_add=True)
+    informed_date = db.DateTimeProperty() 
 
 class MainHandler(webapp.RequestHandler):
     def get(self):
@@ -29,28 +31,19 @@ class SubscribeHandler(webapp.RequestHandler):
         subscriber.put()
         self.response.out.write('s')
         
-class CheckHandler(webapp.RequestHandler):
+class InformHandler(webapp.RequestHandler):
     def get(self):
         query = Subscriber.all().filter('informed', False)
         
-        subscribers = []
         for subscriber in query:
-            subscribers.append(subscriber)
-            
-        values = {'subscribers' : subscribers}
-            
-        path = os.path.join(os.path.dirname(__file__), 'templates/check.html')
-        self.response.out.write(template.render(path, values))
+            price = load_and_return_price(subscriber.steam_app_id)
+            if price <= subscriber.price:
+                self.response.out.write(str(price) + '<=' + str(subscriber.price))
+                self.send_email(subscriber)
+            else:
+                self.response.out.write(str(price) + '>' + str(subscriber.price))
         
-    def post(self):
-        steam_app_id = self.request.get('steam_app_id')
-        self.response.out.write(get_price_for_id(steam_app_id))
-        
-class InformHandler(webapp.RequestHandler):
-    def post(self):
-        id_to_inform = self.request.get('id_to_inform')
-        subscriber = Subscriber.get_by_id(int(id_to_inform))
-        
+    def send_email(self, subscriber):    
         STEAM_URL = 'http://store.steampowered.com/app/'
         
         # Your application won't work on your Localhost, so upload it
@@ -66,13 +59,13 @@ class InformHandler(webapp.RequestHandler):
         """ % (STEAM_URL + str(subscriber.steam_app_id), subscriber.price))
         
         subscriber.informed = True
+        subscriber.informed_date = datetime.datetime.now()
         subscriber.put()
        
 def main():
     application = webapp.WSGIApplication(
             [('/', MainHandler),
              ('/subscribe', SubscribeHandler),
-             ('/check', CheckHandler),
              ('/inform', InformHandler)
             ],debug=False)
     
