@@ -9,12 +9,16 @@ def parse_euro(str):
     return float(numText)
     
 def parse_dollar(str):
-    numText = str[1:len(str)]
+    numText = str[5:len(str)]
     return float(numText)
 
-def load_and_return_price(steam_app_id):
+def parse_pound(str):
+    numText = str[6:len(str)]
+    return float(numText)
+
+def load_and_return_price(steam_app_id, country):
     # load html
-    result = urlfetch.fetch(STEAM_URL + str(steam_app_id))
+    result = urlfetch.fetch(STEAM_URL + str(steam_app_id) + '/?cc=' + country)
     bs = BeautifulSoup(result.content)
     
     # find vs findAll
@@ -37,4 +41,7 @@ def load_and_return_price(steam_app_id):
             priceNum = parse_euro(priceStr)
         if '&#36;' in priceStr:
             priceNum = parse_dollar(priceStr)
+        if '&#163;' in priceStr:
+            priceNum = parse_pound(priceStr)
+            
         return priceNum

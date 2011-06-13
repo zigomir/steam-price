@@ -1,3 +1,5 @@
+# -*- coding: utf_8 -*-
+
 from google.appengine.api import mail
 from google.appengine.ext import webapp, db
 from google.appengine.ext.webapp import template, util
@@ -7,13 +9,24 @@ import os
 
 STEAM_URL = 'http://store.steampowered.com/app/'
 SENDER = 'Steam Price <zigomir@gmail.com>'
+CURRENCY = {'us': '$', 'gb': '£', 'eu': '€'}
+
+def get_price_in_currency(subscriber):
+    try:
+        price_in_currency = CURRENCY[subscriber.country] + str(subscriber.price)
+        return price_in_currency
+    except KeyError:
+        price_in_currency = str(subscriber.price).replace('.', ',') + CURRENCY['eu']
+        return price_in_currency
 
 class Subscriber(db.Model):
     email = db.StringProperty()
     steam_app_id = db.IntegerProperty()
     price = db.FloatProperty()
-    informed = db.BooleanProperty()
+    country = db.StringProperty()
     date = db.DateTimeProperty(auto_now_add=True)
+    
+    informed = db.BooleanProperty()
     informed_date = db.DateTimeProperty() 
 
 class MainHandler(webapp.RequestHandler):
@@ -26,12 +39,17 @@ class SubscribeHandler(webapp.RequestHandler):
         email = self.request.get('email')
         price = self.request.get('price')
         steam_app_id = self.request.get('steam_app_id')
+        country = self.request.get('country')
+        
+        if len(country) <> 2:
+            country = 'us'
         
         subscriber = Subscriber(email=email, 
-                                informed=False,
-                                informed_date=None,
                                 steam_app_id=int(steam_app_id),
-                                price=float(price))
+                                country=country,
+                                price=float(price),
+                                informed=False,
+                                informed_date=None)
         subscriber.put()
         self.send_email(subscriber)
         self.response.out.write('s')
@@ -43,17 +61,18 @@ class SubscribeHandler(webapp.RequestHandler):
                   body="""
         Dear Steam price user:
         
-        You've subscribed for a warning when game (%s) will be cheaper than %d EUR.
+        You've subscribed for a warning when game (%s) will be cheaper than %s.
         
         http://steam-price.appspot.com
-        """ % (STEAM_URL + str(subscriber.steam_app_id), subscriber.price))
+        """ % (STEAM_URL + str(subscriber.steam_app_id), get_price_in_currency(subscriber))
+        )
         
 class InformHandler(webapp.RequestHandler):
     def get(self):
         query = Subscriber.all().filter('informed', False)
         
         for subscriber in query:
-            price = load_and_return_price(subscriber.steam_app_id)
+            price = load_and_return_price(subscriber.steam_app_id, subscriber.country)
             if price <= subscriber.price:
                 self.send_email(subscriber)
                 subscriber.informed = True
@@ -68,10 +87,11 @@ class InformHandler(webapp.RequestHandler):
                   body="""
         Dear Steam price user:
         
-        We're pleased to announce, that price of the game (%s) is lower than %d EUR.
+        We're pleased to announce, that price of the game (%s) is lower than %s.
         
         http://steam-price.appspot.com
-        """ % (STEAM_URL + str(subscriber.steam_app_id), subscriber.price))
+        """ % (STEAM_URL + str(subscriber.steam_app_id), get_price_in_currency(subscriber))
+        )
        
 def main():
     application = webapp.WSGIApplication(
