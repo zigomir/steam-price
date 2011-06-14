@@ -1,18 +1,20 @@
 {% extends "base.html" %}
 
 {% block content %}
-<img src="/images/steam_app_id.png" alt="Steam Application ID" />
+<a href="http://store.steampowered.com/app/620/"><img src="/images/steam_app_id.png" alt="Steam Application ID" /></a>
 <form id="subscribeForm" method="post" action="/subscribe">
     <label for="steam_app_id">Steam Application ID</label>
     <input id="steam_app_id" name="steam_app_id" class="integer required" />
     
-    <label for="price">I want price lower than </label>
-    <input id="price" name="price" class="integer required" />
+    <br />
+    <label for="price">Notify me when the price is lower than</label>
+    <input id="price" name="price" class="integer required" />,
     
-    <label for="email">Remind me on email</label>
-    <input id="email" name="email" type="text" class="required email" />
+    <label for="email">send reminder to this mail</label>
+    <input id="email" name="email" type="text" class="required email" />.
     
-    <label for="country">I use Steam in a country</label>
+    <br />
+    <label for="country">I use Steam in this country</label>
     <select id="country" name="country">
         <option value="us">-- Choose a Country --</option>
         <option value="al">Albania</option>
@@ -206,16 +208,20 @@
         <option value="zm">Zambia</option>
     </select>
     
+    <br />
     <input id="subscribeButton" type="submit" value="Subscribe" class="submit" />
 </form>
 
 <div class="help">
-If you enter wrong application ID here, you might recieve an email, that game is below the price.
-<br />
+If you enter an unexistent application ID, you might receive an e-mail telling you that the price is already lower than your desired price.
+<a href=# id="explain">?</a>
+<div class="hidden">
 This could happen because service will try to lookout for a game site, but because of redirect will get 
 price from Steam store's home page which isn't right.
-<br />
-It's also important, that you choose right country, because Steam has different prices for most of them.
+</div>
+<div>
+Choosing the correct country is equally important, since Steam prices vary from country to country.
+</div>
 </div>
 
 <div id="message" style="color: green;"></div>
@@ -225,6 +231,11 @@ It's also important, that you choose right country, because Steam has different 
 
 <script>
 $('.integer').numeric(false);
+
+$('.hidden').hide();
+$('#explain').click(function() {
+    $('.hidden').show();
+});
 
 $('#subscribeForm').validate({
     submitHandler: function(form) {
@@ -248,5 +259,6 @@ function ajaxSubmit() {
 {% endblock %}
 
 {% block foot %}
+<div class="help disclaimer">Disclaimer: I will not sell, share, or rent your email address.</div>
 <a href="mailto:zigomir@gmail.com">Feedback? (careful, mailto link)</a>
 {% endblock %}

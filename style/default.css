@@ -8,10 +8,10 @@ body {
 }
 
 a {
-    font-size: 0.7em;
-    text-decoration: none;
+	text-decoration: none;
     color: blue;
 }
+
 a:visited {
     color: blue;
     text-decoration: none;
@@ -20,11 +20,19 @@ a:visited {
 #foot {
     position: absolute;
     bottom: 0;
-    height: 25px;   /* Height of the footer */  
+    height: 40px;   /* Height of the footer */  
+}
+
+#foot a {
+    font-size: 0.7em;
 }
 
 .help {
 	font-size: 0.7em;
+}
+
+.disclaimer {
+	font-weight: bold;
 }
 
 label.error {
