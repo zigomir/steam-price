@@ -46,11 +46,11 @@ class SubscribeHandler(webapp.RequestHandler):
     def send_email(self, subscriber):
         mail.send_mail(sender=SENDER,
                   to=subscriber.email,
-                  subject="You've subscribed to steam price checker",
+                  subject="You have subscribed to Steam price notifier",
                   body="""
         Dear Steam price user:
         
-        You've subscribed for a warning when game (%s) will be cheaper than %s.
+        You've subscribed for a notify when a game (%s) will cost less than %s.
         
         http://steam-price.appspot.com
         """ % (STEAM_URL + str(subscriber.steam_app_id), str(subscriber.price))
@@ -73,11 +73,9 @@ class InformHandler(webapp.RequestHandler):
         # Your application won't work on your Localhost, so upload it
         mail.send_mail(sender=SENDER,
                   to=subscriber.email,
-                  subject="Check out new Steam price!",
+                  subject="Check out new price on Steam",
                   body="""
-        Dear Steam price user:
-        
-        We're pleased to announce, that price of the game (%s) is lower than %s.
+        Price of the game (%s) is lower than %s.
         
         http://steam-price.appspot.com
         """ % (STEAM_URL + str(subscriber.steam_app_id), 
