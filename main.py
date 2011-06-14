@@ -48,8 +48,6 @@ class SubscribeHandler(webapp.RequestHandler):
                   to=subscriber.email,
                   subject="You have subscribed to Steam price notifier",
                   body="""
-        Dear Steam price user:
-        
         You've subscribed for a notify when a game (%s) will cost less than %s.
         
         http://steam-price.appspot.com
