@@ -1,3 +1,36 @@
 .integer {
 	width: 50px
 }
+
+body {
+    font-family: Verdana, Helvetica, sans-serif;
+    background-color: #DDDDDD;
+}
+
+a {
+    font-size: 0.7em;
+    text-decoration: none;
+    color: blue;
+}
+a:visited {
+    color: blue;
+    text-decoration: none;
+}
+
+#foot {
+    position: absolute;
+    bottom: 0;
+    height: 25px;   /* Height of the footer */  
+}
+
+.help {
+	font-size: 0.7em;
+}
+
+label.error {
+	float: none;
+	color: red;
+	padding-left: 0.5em;
+	vertical-align: top;
+	font-size: 0.7em;
+}

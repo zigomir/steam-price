@@ -1,19 +1,20 @@
 {% extends "base.html" %}
 
 {% block content %}
-<form id="subscribeForm">
-    <label for="steam_app_id">Steam APP ID</label>
-    <input id="steam_app_id" name="steam_app_id" class="integer" />
+<img src="/images/steam_app_id.png" alt="Steam Application ID" />
+<form id="subscribeForm" method="post" action="/subscribe">
+    <label for="steam_app_id">Steam Application ID</label>
+    <input id="steam_app_id" name="steam_app_id" class="integer required" />
     
     <label for="price">I want price lower than </label>
-    <input id="price" name="price" class="integer" />
+    <input id="price" name="price" class="integer required" />
     
-    <label for="email">Email</label>
-    <input id="email" name="email" type="text" />
+    <label for="email">Remind me on email</label>
+    <input id="email" name="email" type="text" class="required email" />
     
-    <label for="country">Country</label>
+    <label for="country">I use Steam in a country</label>
     <select id="country" name="country">
-        <option value="">-- Choose a Country --</option>
+        <option value="us">-- Choose a Country --</option>
         <option value="al">Albania</option>
         <option value="dz">Algeria</option>
         <option value="ad">Andorra</option>
@@ -205,28 +206,47 @@
         <option value="zm">Zambia</option>
     </select>
     
-    <input id="subscribeButton" type="button" value="Subscribe" />
+    <input id="subscribeButton" type="submit" value="Subscribe" class="submit" />
 </form>
-<div id="message" style="color: green;"></div>
-<div id="foot">
-    <a href="mailto:zigomir@gmail.com">Feedback? (careful, mailto link)</a>
+
+<div class="help">
+If you enter wrong application ID here, you might recieve an email, that game is already below the price.
+<br />
+This could happen because service will try to lookout for a game site, but because of redirect will get 
+price from Steam store's home page which isn't right.
+<br />
+It's also important, that you choose right country, because Steam has different prices for most of them.
 </div>
 
+<div id="message" style="color: green;"></div>
+
 <script src="/script/jquery.numeric.js"></script>
+<script src="/script/jquery.validate.min.js"></script>
+
 <script>
 $('.integer').numeric(false);
 
-$('#subscribeButton').click(function() {
+$('#subscribeForm').validate({
+    submitHandler: function(form) {
+        ajaxSubmit();
+    }
+});
+
+function ajaxSubmit() {
     $('#message').text('');
     
     $.post('/subscribe', 
-        $("#subscribeForm").serialize(), 
+        $('#subscribeForm').serialize(), 
         function(data) {
             if (data === 's') {
-                $('#message').text('Thanks for using this app. You will recieve an email when price is lower than that.');
+                $('#message').text('Subscription recieved. You will recieve an email when price is lower than that.');
             }
         }, 
         'text');
-});
+}
 </script>
+{% endblock %}
+
+{% block foot %}
+<a href="mailto:zigomir@gmail.com">Feedback? (careful, mailto link)</a>
 {% endblock %}

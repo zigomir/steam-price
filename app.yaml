@@ -9,6 +9,9 @@ handlers:
 
 - url: /script
   static_dir: script
+  
+- url: /images
+  static_dir: images
 
 - url: .*
   script: main.py
