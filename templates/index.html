@@ -5,6 +5,7 @@
 <form id="subscribeForm" method="post" action="/subscribe">
     <label for="steam_app_id">Steam Application ID</label>
     <input id="steam_app_id" name="steam_app_id" class="integer required" value="620" />
+    <img id="animate_load" src="/images/ajax-loader.gif" style="display: none;" />
     <span class="steam_app_title" id="steam_app_title"></span>
     
     <br />
@@ -57,6 +58,8 @@ function ajaxSubmit() {
 
 $('#steam_app_id').change(function(){
     $('#subscribeButton').prop('disabled', true);
+    $('#steam_app_title').text('');
+    $('#animate_load').show();
     ajaxGetAppTitle($(this).val());
 });
 
@@ -71,6 +74,7 @@ function ajaxGetAppTitle(steam_app_id) {
             } else {
                 $('#steam_app_title').text('No game with this ID');
             }
+            $('#animate_load').hide();
         }, 
         'json');
 }
