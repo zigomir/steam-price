@@ -29,6 +29,9 @@
     
     <div style="clear: both;">
         <input id="country" name="country" type="hidden" value="{{country}}" />
+        <input id="steam_app_title_input" name="steam_app_title_input" type="hidden" />
+        <input id="price_with_currency" name="price_with_currency" type="hidden" />
+        
         <input id="subscribeButton" type="submit" value="Subscribe" class="submit button" />
         <span id="message" style="color: green;"></span>
     </div>
@@ -60,8 +63,14 @@ function ajaxSubmit() {
     $.post('/subscribe', 
         $('#subscribeForm').serialize(), 
         function(data) {
+            console.log(data);
             if (data === 's') {
                 $('#message').text('Subscription recieved. You will recieve an email when price is lower than ' + $('#price').val() + $('#currency_sign').text());
+                $('#subscribeButton').prop('disabled', true);
+                
+                // clear form
+                $(':input','#subscribeForm').not(':submit').val('');
+                $('#steam_app_title').text('');
             }
         }, 
         'text');
@@ -71,6 +80,7 @@ function ajaxSubmit() {
 $('#steam_app_id').change(function(){
     $('#subscribeButton').prop('disabled', true);
     $('#steam_app_title').text('');
+    $('#message').text('');
     $('#animation').show();
     
     var steam_app_id = $(this).val();
@@ -86,9 +96,16 @@ function ajaxGetAppTitle(steam_app_id) {
                 $('#subscribeButton').prop('disabled', false);
                 $('#steam_app_title').text(data['title'] + ' (' + data['price_with_currency'] + ')');
                 $('#currency_sign').text(data['currency_sign']);
+                
+                // for input value
+                $('#steam_app_title_input').val(data['title']);
+                $('#price_with_currency').val(data['price_with_currency']);
+                
+                // extra validation
                 price_now = data['price'];
             } else {
                 $('#steam_app_title').text('No game with this ID');
+                $('#steam_app_title_input').val('');
             }
             $('#animation').hide();
         }, 
