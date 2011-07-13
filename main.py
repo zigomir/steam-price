@@ -44,7 +44,7 @@ class SubscribeHandler(webapp.RequestHandler):
                                 price=float(price),
                                 informed=False,
                                 informed_date=None)
-        subscriber.put()
+        #subscriber.put()
         self.send_email(subscriber)
         self.response.out.write('s')
         
@@ -85,6 +85,9 @@ class InformHandler(webapp.RequestHandler):
                get_price_in_currency(subscriber.price, currency_sign)))
         
 def get_price_in_currency(price, currency_sign):
+    if price == 0:
+        return "Free to Play"
+    
     if currency_sign == '€':
         return ("%.2f" % price).replace('.', ',') + currency_sign
     else:

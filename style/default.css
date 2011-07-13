@@ -1,18 +1,51 @@
-.integer {
-	width: 50px
-}
-
-.steam_app_title {
-	font-weight: bold;
-}
-
-.disclaimer {
-    font-weight: bold;
-}
+@import url(http://fonts.googleapis.com/css?family=Droid+Sans:bold+Lobster);
 
 body {
     font-family: "Trebuchet MS", Arial, "Bitstream Vera Sans", sans-serif;
     background-color: #DDDDDD;
+}
+
+.content {
+    margin-top: 5%;
+    margin-left: 3%;
+}
+
+input.integer {
+    width: 45px
+}
+
+input.email {
+    width: 205px
+}
+
+input:focus {
+    outline: none;
+}
+
+input[type=text] {
+    background-color: #DDDDDD;  /* because IE can't inherit */
+    border-top: none;
+    border-left: none;
+    border-right: none;
+    border-bottom-color: red;
+    font-family: "Trebuchet MS", Arial, "Bitstream Vera Sans", sans-serif;
+    font-size: 100%;
+}
+
+h1 {
+    font: 46px 'Droid Sans', sans-serif;
+    font-weight: bold;
+    text-shadow: rgba(255,255,255,.5) 0 1px 0;
+    cursor: default;
+    margin-bottom: 3px;
+}
+
+.steam_app_title {
+    font-weight: bold;
+}
+
+.disclaimer {
+    font-weight: bold;
 }
 
 a {
@@ -25,14 +58,18 @@ a:visited {
     text-decoration: none;
 }
 
-#foot {
+.foot {
     position: absolute;
     bottom: 0;
     height: 50px;   /* Height of the footer */  
 }
 
-#foot a {
+.foot a {
     font-size: 0.7em;
+}
+
+img {
+	border: none;
 }
 
 label.error {
@@ -41,4 +78,61 @@ label.error {
 	padding-left: 0.5em;
 	vertical-align: top;
 	font-size: 0.7em;
+}
+
+#steam_app_id_div {
+	float: left;
+}
+
+#less_than_div {
+	margin-left: 2px;
+	float: left;
+}
+
+/* Loading animation */
+#animation {
+	margin-top: 3px;
+    float: left;
+    display: none;
+}
+.animation_block {
+	background-color:#7A696E;
+	border:2px solid #C4A3AB;
+	float:left;
+	height:14px;
+	margin-left:5px;
+	width:8px;
+	opacity:0.1;
+	
+	-webkit-transform: scale(0.7);
+	-webkit-animation-name: animate;
+	-webkit-animation-duration: 1s;
+	-webkit-animation-iteration-count: infinite;
+	-webkit-animation-direction: linear;
+	
+	-moz-transform: scale(0.7);
+    -moz-animation-name: animate;
+    -moz-animation-duration: 1s;
+    -moz-animation-iteration-count: infinite;
+    -moz-animation-direction: linear;
+}
+#block_1 {
+    -webkit-animation-delay: .3s;
+    -moz-animation-delay: .3s;
+}
+#block_2 {
+    -webkit-animation-delay: .4s;
+    -moz-animation-delay: .4s;
+}
+#block_3 {
+    -webkit-animation-delay: .5s;
+    -moz-animation-delay: .5s;
+}
+@-webkit-keyframes animate {
+    0%{-webkit-transform: scale(1.2); opacity:1;}
+    100%{-webkit-transform: scale(0.7); opacity:0.1;}
+}
+@-moz-keyframes animate {
+    0%{-moz-transform: scale(1.2); opacity:1;}
+    100%{-moz-transform: scale(0.7); opacity:0.1;}
 }

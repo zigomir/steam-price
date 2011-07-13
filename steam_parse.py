@@ -33,7 +33,8 @@ def find_price(bs):
         except AttributeError:
             # Only discount price'
             pass
-        
+    
+    priceNum, currency_sign = -1, '$'    
     if len(priceStr) > 0:
         if '&#8364;' in priceStr:
             priceNum, currency_sign = parse_euro(priceStr), '€'
@@ -41,10 +42,10 @@ def find_price(bs):
             priceNum, currency_sign = parse_dollar(priceStr), '$'
         if '&#163;' in priceStr:
             priceNum, currency_sign = parse_pound(priceStr), '£'
+        if 'Free to Play' in priceStr:
+            priceNum = 0
         
-        return priceNum, currency_sign
-    
-    return '0.00', '$'  # default return
+    return priceNum, currency_sign
 
 def get_price(steam_app_id, country):
     # load html
