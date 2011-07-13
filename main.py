@@ -44,7 +44,7 @@ class SubscribeHandler(webapp.RequestHandler):
                                 price=float(price),
                                 informed=False,
                                 informed_date=None)
-        #subscriber.put()
+        subscriber.put()
         self.send_email(subscriber)
         self.response.out.write('s')
         
