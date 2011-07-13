@@ -61,8 +61,8 @@ def find_title(bs):
     
     return title
     
-def get_app_title(steam_app_id):
-    result = urlfetch.fetch(STEAM_URL + str(steam_app_id))
+def get_app_title(steam_app_id, country):
+    result = urlfetch.fetch(STEAM_URL + str(steam_app_id) + '/?cc=' + country)
     bs = BeautifulSoup(result.content)
     title = find_title(bs)
     price, currency_sign = find_price(bs)

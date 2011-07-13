@@ -92,7 +92,11 @@ def get_price_in_currency(price, currency_sign):
     
 class AppTitleHandler(webapp.RequestHandler):
     def get(self, steam_app_id):
-        title, price, currency_sign = get_app_title(steam_app_id)
+        country = self.request.headers.get('X-AppEngine-country')
+        if isinstance(country, NoneType):   # for localhost testing only, because this header is only on production server
+            country = 'si'
+        
+        title, price, currency_sign = get_app_title(steam_app_id, country)
         price_with_currency = get_price_in_currency(price, currency_sign)
         if title == '':
             title = 'null'
