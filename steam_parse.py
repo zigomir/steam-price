@@ -19,12 +19,7 @@ def parse_pound(str):
     numText = str[6:len(str)]
     return float(numText)
 
-def load_and_return_price(steam_app_id, country):
-    # load html
-    result = urlfetch.fetch(STEAM_URL + str(steam_app_id) + '/?cc=' + country)
-    bs = BeautifulSoup(result.content)
-    
-    # find vs findAll
+def find_price(bs):
     priceStr = ''
     try:
         priceStr = bs.find('div', {'class': 'discount_final_price'}).getText().strip()
@@ -38,7 +33,7 @@ def load_and_return_price(steam_app_id, country):
         except AttributeError:
             # Only discount price'
             pass
-    
+        
     if len(priceStr) > 0:
         if '&#8364;' in priceStr:
             priceNum, currency_sign = parse_euro(priceStr), '€'
@@ -46,5 +41,29 @@ def load_and_return_price(steam_app_id, country):
             priceNum, currency_sign = parse_dollar(priceStr), '$'
         if '&#163;' in priceStr:
             priceNum, currency_sign = parse_pound(priceStr), '£'
-            
+        
         return priceNum, currency_sign
+    
+    return '0.00', '$'  # default return
+
+def get_price(steam_app_id, country):
+    # load html
+    result = urlfetch.fetch(STEAM_URL + str(steam_app_id) + '/?cc=' + country)
+    bs = BeautifulSoup(result.content)
+    return find_price(bs)
+    
+def find_title(bs):
+    title = ''
+    try:
+        title = bs.find('div', {'class': 'game_name'}).find('div', {'class': 'blockbg'}).getText().strip()
+    except AttributeError:
+        pass
+    
+    return title
+    
+def get_app_title(steam_app_id):
+    result = urlfetch.fetch(STEAM_URL + str(steam_app_id))
+    bs = BeautifulSoup(result.content)
+    title = find_title(bs)
+    price, currency_sign = find_price(bs)
+    return title, price, currency_sign

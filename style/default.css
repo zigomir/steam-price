@@ -2,8 +2,16 @@
 	width: 50px
 }
 
+.steam_app_title {
+	font-weight: bold;
+}
+
+.disclaimer {
+    font-weight: bold;
+}
+
 body {
-    font-family: Verdana, Helvetica, sans-serif;
+    font-family: "Trebuchet MS", Arial, "Bitstream Vera Sans", sans-serif;
     background-color: #DDDDDD;
 }
 
@@ -20,19 +28,11 @@ a:visited {
 #foot {
     position: absolute;
     bottom: 0;
-    height: 40px;   /* Height of the footer */  
+    height: 50px;   /* Height of the footer */  
 }
 
 #foot a {
     font-size: 0.7em;
-}
-
-.help {
-	font-size: 0.7em;
-}
-
-.disclaimer {
-	font-weight: bold;
 }
 
 label.error {

@@ -3,7 +3,7 @@
 from google.appengine.api import mail
 from google.appengine.ext import webapp, db
 from google.appengine.ext.webapp import template, util
-from steam_parse import load_and_return_price #@UnresolvedImport
+from steam_parse import get_price, get_app_title #@UnresolvedImport
 from types import NoneType
 import datetime
 import os
@@ -27,7 +27,7 @@ class MainHandler(webapp.RequestHandler):
         path = os.path.join(os.path.dirname(__file__), 'templates/index.html')
         country = self.request.headers.get('X-AppEngine-country')
         if isinstance(country, NoneType):   # for localhost testing only, because this header is only on production server
-            country = 'us'
+            country = 'si'
         template_values = {'country': country.lower()}
         self.response.out.write(template.render(path, template_values))
         
@@ -44,7 +44,7 @@ class SubscribeHandler(webapp.RequestHandler):
                                 price=float(price),
                                 informed=False,
                                 informed_date=None)
-        subscriber.put()
+        #subscriber.put()
         self.send_email(subscriber)
         self.response.out.write('s')
         
@@ -64,7 +64,7 @@ class InformHandler(webapp.RequestHandler):
         query = Subscriber.all().filter('informed', False)
         
         for subscriber in query:
-            price, currency_sign = load_and_return_price(subscriber.steam_app_id, subscriber.country)
+            price, currency_sign = get_price(subscriber.steam_app_id, subscriber.country)
             
             if price <= subscriber.price:
                 self.send_email(subscriber, currency_sign)
@@ -89,13 +89,24 @@ def get_price_in_currency(price, currency_sign):
         return ("%.2f" % price).replace('.', ',') + currency_sign
     else:
         return currency_sign + ("%.2f" % price)
-        
+    
+class AppTitleHandler(webapp.RequestHandler):
+    def get(self, steam_app_id):
+        title, price, currency_sign = get_app_title(steam_app_id)
+        price_with_currency = get_price_in_currency(price, currency_sign)
+        if title == '':
+            title = 'null'
+        # without str for title I would get strange ascii error. don't know if it's appengine bug
+        json_response = '{"title": "%s", "price": %.2f, "currency_sign": "%s", "price_with_currency": "%s"}' %  \
+                        (str(title), price, currency_sign, price_with_currency)
+        self.response.out.write(json_response)
        
 def main():
     application = webapp.WSGIApplication(
             [('/', MainHandler),
              ('/subscribe', SubscribeHandler),
-             ('/inform', InformHandler)
+             ('/inform', InformHandler),
+             ('/app_title/([^/]+)?', AppTitleHandler)
             ],debug=False)
     
     util.run_wsgi_app(application)
