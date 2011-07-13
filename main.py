@@ -15,10 +15,10 @@ SENDER = 'Steam Price <zigomir@gmail.com>'
 class Subscriber(db.Model):
     email = db.StringProperty()
     steam_app_id = db.IntegerProperty()
-    price = db.FloatProperty()
+    price = db.FloatProperty() # price below which user wants to be informed
     country = db.StringProperty()
-    steam_app_title = db.StringProperty()
-    price_with_currency = db.StringProperty()
+    steam_app_title = db.StringProperty() # app title from app id user subscribed to
+    price_with_currency = db.StringProperty() # price with currency when subscribed
     date = db.DateTimeProperty(auto_now_add=True)
     
     informed = db.BooleanProperty()
@@ -65,7 +65,7 @@ class SubscribeHandler(webapp.RequestHandler):
         You've subscribed for a notify when %s (%s) will cost less than %s
         
         http://steam-price.appspot.com
-        """ % (subscriber.steam_app_title, STEAM_URL + str(subscriber.steam_app_id), subscriber.price_with_currency)
+        """ % (str(subscriber.steam_app_title), STEAM_URL + str(subscriber.steam_app_id), subscriber.price_with_currency)
         )
         
 class InformHandler(webapp.RequestHandler):
@@ -73,15 +73,15 @@ class InformHandler(webapp.RequestHandler):
         query = Subscriber.all().filter('informed', False)
         
         for subscriber in query:
-            price, _ = get_price(subscriber.steam_app_id, subscriber.country)
+            price, currency_sign = get_price(subscriber.steam_app_id, subscriber.country)
             
             if price <= subscriber.price:
-                self.send_email(subscriber)
+                self.send_email(subscriber, currency_sign)
                 subscriber.informed = True
                 subscriber.informed_date = datetime.datetime.now()
                 subscriber.put()
         
-    def send_email(self, subscriber):
+    def send_email(self, subscriber, currency_sign):
         # Your application won't work on your Localhost, so upload it
         mail.send_mail(sender=SENDER,
                   to=subscriber.email,
@@ -90,9 +90,8 @@ class InformHandler(webapp.RequestHandler):
         Price of the game %s (%s) is lower than %s.
         
         http://steam-price.appspot.com
-        """ % (subscriber.steam_app_title, STEAM_URL + str(subscriber.steam_app_id), subscriber.price_with_currency)
+        """ % (str(subscriber.steam_app_title), STEAM_URL + str(subscriber.steam_app_id), get_price_in_currency(subscriber.price, currency_sign))
         )
-
     
 class AppTitleHandler(webapp.RequestHandler):
     def get(self, steam_app_id):
@@ -101,7 +100,7 @@ class AppTitleHandler(webapp.RequestHandler):
             country = 'si'
         
         title, price, currency_sign = get_app_title(steam_app_id, country)
-        price_with_currency = self.get_price_in_currency(price, currency_sign)
+        price_with_currency = get_price_in_currency(price, currency_sign)
         if title == '':
             title = 'null'
         # without str for title I would get strange ascii error. don't know if it's appengine bug
@@ -109,14 +108,14 @@ class AppTitleHandler(webapp.RequestHandler):
                         (str(title), price, currency_sign, price_with_currency)
         self.response.out.write(json_response)
         
-    def get_price_in_currency(self, price, currency_sign):
-        if price == 0:
-            return "Free to Play"
-        
-        if currency_sign == '€':
-            return ("%.2f" % price).replace('.', ',') + currency_sign
-        else:
-            return currency_sign + ("%.2f" % price)
+def get_price_in_currency(price, currency_sign):
+    if price == 0:
+        return "Free to Play"
+    
+    if currency_sign == '€':
+        return ("%.2f" % price).replace('.', ',') + currency_sign
+    else:
+        return currency_sign + ("%.2f" % price)
        
 def main():
     application = webapp.WSGIApplication(
