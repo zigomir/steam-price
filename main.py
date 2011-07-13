@@ -4,6 +4,7 @@ from google.appengine.api import mail
 from google.appengine.ext import webapp, db
 from google.appengine.ext.webapp import template, util
 from steam_parse import load_and_return_price #@UnresolvedImport
+from types import NoneType
 import datetime
 import os
 
@@ -24,7 +25,11 @@ class Subscriber(db.Model):
 class MainHandler(webapp.RequestHandler):
     def get(self):
         path = os.path.join(os.path.dirname(__file__), 'templates/index.html')
-        self.response.out.write(template.render(path, None))
+        country = self.request.headers.get('X-AppEngine-country')
+        if isinstance(country, NoneType):   # for localhost testing only, because this header is only on production server
+            country = 'us'
+        template_values = {'country': country.lower()}
+        self.response.out.write(template.render(path, template_values))
         
 class SubscribeHandler(webapp.RequestHandler):
     def post(self):
