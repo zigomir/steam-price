@@ -6,7 +6,7 @@
 <form id="subscribeForm" method="post" action="/subscribe">
     <div>
         <label for="email">Please send notification to</label>
-        <input id="email" name="email" type="text" class="required email" />
+        <input id="email" name="email" type="text" class="required email" placeholder="My email here" />
     </div>
     
     <div id="steam_app_id_div">
@@ -23,7 +23,7 @@
     <div id="less_than_div">
         <span class="steam_app_title" id="steam_app_title"></span>
         <label for="price">is less than</label>
-        <input id="price" name="price" type="text" class="integer required" maxlength="2" />
+        <input id="price" name="price" type="text" class="integer required" maxlength="2" placeholder="Price" />
         <span id="currency_sign"></span>
     </div>
     
@@ -39,82 +39,11 @@
 
 <script src="/script/jquery.numeric.js"></script>
 <script src="/script/jquery.validate.min.js"></script>
-
-<script>
-$('#subscribeButton').prop('disabled', true);
-$('.integer').numeric(false);
-
-var price_now = 0;
-
-$('#subscribeForm').validate({
-    submitHandler: function(form) {
-        // custom validation
-        if (price_now < $('#price').val()) {
-            $('#message').text('Price already lower than ' + $('#price').val() + $('#currency_sign').text());
-        } else {
-            ajaxSubmit();
-        }
-    }
-});
-
-function ajaxSubmit() {
-    $('#message').text('');
-    
-    $.post('/subscribe', 
-        $('#subscribeForm').serialize(), 
-        function(data) {
-            console.log(data);
-            if (data === 's') {
-                $('#message').text('Subscription recieved. You will recieve an email when price is lower than ' + $('#price').val() + $('#currency_sign').text());
-                $('#subscribeButton').prop('disabled', true);
-                
-                // clear form
-                $(':input','#subscribeForm').not(':submit').val('');
-                $('#steam_app_title').text('');
-            }
-        }, 
-        'text');
-}
-
-
-$('#steam_app_id').change(function(){
-    $('#subscribeButton').prop('disabled', true);
-    $('#steam_app_title').text('');
-    $('#message').text('');
-    $('#animation').show();
-    
-    var steam_app_id = $(this).val();
-    if (steam_app_id.length > 0) {
-        ajaxGetAppTitle(steam_app_id);
-    }
-});
-
-function ajaxGetAppTitle(steam_app_id) {
-    $.get('/app_title/' + steam_app_id, 
-        function(data) {
-            if(data['title'] != 'null') {
-                $('#subscribeButton').prop('disabled', false);
-                $('#steam_app_title').text(data['title'] + ' (' + data['price_with_currency'] + ')');
-                $('#currency_sign').text(data['currency_sign']);
-                
-                // for input value
-                $('#steam_app_title_input').val(data['title']);
-                $('#price_with_currency').val(data['price_with_currency']);
-                
-                // extra validation
-                price_now = data['price'];
-            } else {
-                $('#steam_app_title').text('No game with this ID');
-                $('#steam_app_title_input').val('');
-            }
-            $('#animation').hide();
-        }, 
-        'json');
-}
-</script>
+<script src="/script/application.js"></script>
 {% endblock %}
 
 {% block foot %}
-<div class="help disclaimer">Disclaimer: I will not sell, share, or rent your email address.</div>
-<a href="mailto:zigomir@gmail.com">Feedback? (careful, mailto link)</a>
+<div class="disclaimer">Disclaimer: I will not sell, share, or rent your email address</div>
+<div class="disclaimer">Site optimized for newest WebKit (Chrome, Safari) and Firefox browsers</div>
+<a href="mailto:zigomir@gmail.com">Questions? Email me</a>
 {% endblock %}

@@ -45,7 +45,7 @@ h1 {
 }
 
 .disclaimer {
-    font-weight: bold;
+    font-size: 0.8em;
 }
 
 a {
@@ -61,7 +61,8 @@ a:visited {
 .foot {
     position: absolute;
     bottom: 0;
-    height: 50px;   /* Height of the footer */  
+    left: 5px;
+    height: 45px;   /* Height of the footer */  
 }
 
 .foot a {
