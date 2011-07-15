@@ -62,7 +62,7 @@ a:visited {
     position: absolute;
     bottom: 0;
     left: 5px;
-    height: 45px;   /* Height of the footer */  
+    height: 75px; /* Height of the footer */  
 }
 
 .foot a {
