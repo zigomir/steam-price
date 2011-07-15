@@ -38,10 +38,10 @@ $('#steam_app_id').change(function(){
     $('#subscribeButton').prop('disabled', true);
     $('#steam_app_title').text('');
     $('#message').text('');
-    $('#animation').show();
     
     var steam_app_id = $(this).val();
     if (steam_app_id.length > 0) {
+        $('#animation').show();
         ajaxGetAppTitle(steam_app_id);
     }
 });
