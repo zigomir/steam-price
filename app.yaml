@@ -9,14 +9,9 @@ handlers:
 
 - url: /script
   static_dir: script
-  
+
 - url: /images
   static_dir: images
 
 - url: .*
   script: main.py
-
-- url: /(.*\.woff)
-  mime_type: application/x-font-woff
-  static_files: static/\1
-  upload: static/(.*\.woff)
