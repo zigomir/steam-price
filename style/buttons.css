@@ -25,7 +25,6 @@ Following additional class names are supported:
 
 @import url(http://fonts.googleapis.com/css?family=Droid+Sans:bold+Lobster);
 @import url(http://fonts.googleapis.com/css?family=Lobster);
-@import url(pictos/pictos.css);
 
 
 /* -------------- THE button -------------- */
@@ -91,11 +90,8 @@ button.button:hover {
 
 /* -------------- icon -------------- */
 .button:before {
-	font: 			1.2em/0 'Pictos', sans-serif;
 	content: 		attr(data-icon); /* gets the icon value from the custom data attribute and puts it infront of the button label */
 	margin-right: 	0.4em;
-	
-	
 }
 /* icon only */
 .icon {
