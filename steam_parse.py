@@ -22,14 +22,16 @@ def parse_pound(str):
 def find_price(bs):
     priceStr = ''
     try:
-        priceStr = bs.find('div', {'class': 'discount_final_price'}).getText().strip()
+        priceStr = bs.find('div', {'class': 'game_area_purchase_game'}) \
+                     .find('div', {'class': 'discount_final_price'}).getText().strip()
     except AttributeError:
         # No discount price
         pass
     
     if len(priceStr) == 0:    
         try:
-            priceStr = bs.find('div', {'class': 'game_purchase_price price'}).getText().strip()
+            priceStr = bs.find('div', {'class': 'game_area_purchase_game'}) \
+                         .find('div', {'class': 'game_purchase_price price'}).getText().strip()
         except AttributeError:
             # Only discount price'
             pass
